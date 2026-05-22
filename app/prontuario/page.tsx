@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { Topbar } from "@/components/Topbar";
@@ -27,6 +27,14 @@ type Attachment = { id: string; fileUrl: string };
 type PrevRecord = { id: string; title: string; date: string };
 
 export default function ProntuarioPage() {
+  return (
+    <Suspense fallback={<AppShell><Topbar title="Prontuário" subtitle="Atendimento atual" /></AppShell>}>
+      <ProntuarioPageInner />
+    </Suspense>
+  );
+}
+
+function ProntuarioPageInner() {
   const params = useSearchParams();
   const appointmentId = params.get("appointmentId") ?? "";
   const patientId = params.get("patientId") ?? "";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { Topbar } from "@/components/Topbar";
@@ -48,6 +48,14 @@ function maskCpf(raw: string) {
 }
 
 export default function PerfilPage() {
+  return (
+    <Suspense fallback={<AppShell><Topbar title="Carregando…" subtitle="Perfil do paciente" /></AppShell>}>
+      <PerfilPageInner />
+    </Suspense>
+  );
+}
+
+function PerfilPageInner() {
   const params = useSearchParams();
   const id = params.get("id") ?? "";
   const [profile, setProfile] = useState<ProfileDto | null>(null);

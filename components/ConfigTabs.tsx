@@ -2,18 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const tabs = [
   { href: "/configuracoes/servicos", label: "Serviços" },
   { href: "/configuracoes/horarios", label: "Horários" },
   { href: "/configuracoes/anamnese", label: "Formulário de Anamnese" },
+  { href: "/configuracoes/usuarios", label: "Usuários", masterOnly: true },
 ];
 
 export function ConfigTabs() {
   const pathname = usePathname();
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/session/me")
+      .then((r) => (r.ok ? r.json() : { user: null }))
+      .then((d) => setRole(d.user?.role ?? null))
+      .catch(() => setRole(null));
+  }, []);
+
+  const visible = tabs.filter((t) => !t.masterOnly || role === "MASTER");
+
   return (
     <div className="flex items-center gap-1 mb-8 border-b border-sage-100">
-      {tabs.map((t) => {
+      {visible.map((t) => {
         const active = pathname === t.href;
         return (
           <Link

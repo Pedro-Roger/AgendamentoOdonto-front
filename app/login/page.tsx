@@ -49,10 +49,10 @@ export default function LoginPage() {
           <Image
             src="/sorriso.png"
             alt="Sorriso Clínica Odontológica"
-            width={200}
-            height={80}
+            width={640}
+            height={240}
             priority
-            className="h-auto w-auto max-h-20 object-contain"
+            className="h-auto w-auto max-h-64 object-contain"
           />
 
           <div className="max-w-md">
@@ -87,10 +87,10 @@ export default function LoginPage() {
             <Image
               src="/sorriso.png"
               alt="Sorriso"
-              width={160}
-              height={60}
+              width={480}
+              height={180}
               priority
-              className="h-auto w-auto max-h-16 object-contain"
+              className="h-auto w-auto max-h-48 object-contain"
             />
           </div>
 

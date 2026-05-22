@@ -56,6 +56,22 @@ export const adminApi = {
   listAppointments: (date?: string) => req<AppointmentListItemDto[]>(`api/appointments${date ? `?date=${encodeURIComponent(date)}` : ''}`),
   patientProfile: (id: string) => req(`api/patients/${id}/profile`),
   patientTimeline: (id: string) => req(`api/patients/${id}/timeline`),
+
+  listUsers: () => req<UserAdminDto[]>('api/users'),
+  createUser: (body: { name: string; email: string; password: string; role: 'MASTER' | 'ADMIN' }) =>
+    req<UserAdminDto>('api/users', { method: 'POST', body: JSON.stringify(body) }),
+  updateUser: (id: string, body: Partial<{ name: string; email: string; password: string; role: 'MASTER' | 'ADMIN'; isActive: boolean }>) =>
+    req<UserAdminDto>(`api/users/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+};
+
+export type UserAdminDto = {
+  id: string;
+  name: string;
+  email: string;
+  role: 'MASTER' | 'ADMIN';
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export const publicApi = {

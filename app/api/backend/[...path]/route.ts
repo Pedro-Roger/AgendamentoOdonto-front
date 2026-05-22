@@ -15,6 +15,10 @@ async function proxy(request: Request, pathParts: string[]) {
 
   const headers = new Headers(request.headers);
   headers.delete('host');
+  headers.delete('content-length');
+  headers.delete('content-encoding');
+  headers.delete('transfer-encoding');
+  headers.delete('connection');
   if (session?.accessToken) {
     headers.set('authorization', `Bearer ${session.accessToken}`);
   }

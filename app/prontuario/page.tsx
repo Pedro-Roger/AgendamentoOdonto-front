@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { adminApi } from "@/src/lib/frontend-api";
-import { Odontograma } from "@/components/Odontograma";
+import { Odontograma, type OdontogramaState } from "@/components/Odontograma";
 
 type Draft = {
   assessment: string;
@@ -47,6 +47,7 @@ function ProntuarioPageInner() {
     vitals: "",
   });
   const [recordId, setRecordId] = useState<string | null>(null);
+  const [odontogram, setOdontogram] = useState<OdontogramaState>({});
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [previous, setPrevious] = useState<PrevRecord[]>([]);
   const [openDup, setOpenDup] = useState(false);
@@ -61,11 +62,18 @@ function ProntuarioPageInner() {
     if (!patientId) return;
     adminApi
       .patientTimeline(patientId)
-      .then((events: any) => {
+      .then(async (events: any) => {
         const records = ((events as any[]) ?? [])
           .filter((e) => e.type === "MEDICAL_RECORD")
           .map((e) => ({ id: e.id, title: e.title, date: e.date }));
         setPrevious(records);
+        if (records.length > 0) {
+          try {
+            const latest: any = await adminApi.getMedicalRecord(records[0].id);
+            const odo = latest?.content?.odontogram;
+            if (odo && typeof odo === "object") setOdontogram(odo as OdontogramaState);
+          } catch {}
+        }
       })
       .catch(() => setPrevious([]));
   }, [patientId]);
@@ -85,7 +93,7 @@ function ProntuarioPageInner() {
     try {
       const rec: any = await adminApi.createMedicalRecord({
         appointmentId,
-        content: { ...draft },
+        content: { ...draft, odontogram },
       });
       setRecordId(rec?.id ?? null);
       setSuccess("Prontuário salvo.");
@@ -100,7 +108,11 @@ function ProntuarioPageInner() {
     setError(null);
     try {
       const rec: any = await adminApi.duplicateMedicalRecord(prevId);
-      if (rec?.content) setDraft((d) => ({ ...d, ...rec.content }));
+      if (rec?.content) {
+        const { odontogram: odo, ...rest } = rec.content as Record<string, unknown>;
+        setDraft((d) => ({ ...d, ...(rest as Partial<Draft>) }));
+        if (odo && typeof odo === "object") setOdontogram(odo as OdontogramaState);
+      }
       if (rec?.id) setRecordId(rec.id);
       setOpenDup(false);
     } catch (e: any) {
@@ -164,7 +176,7 @@ function ProntuarioPageInner() {
       )}
 
       <div className="mb-6">
-        <Odontograma />
+        <Odontograma value={odontogram} onChange={setOdontogram} />
       </div>
 
       <div className="grid grid-cols-3 gap-6">

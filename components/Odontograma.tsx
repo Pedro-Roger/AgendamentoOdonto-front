@@ -2,13 +2,22 @@
 
 import { useState } from "react";
 
+export type OdontogramaEstado =
+  | "saudavel"
+  | "restaurado"
+  | "cariado"
+  | "extraido"
+  | "tratamento";
+
+export type OdontogramaState = Record<number, OdontogramaEstado>;
+
 // Notação FDI (universal)
 const superiorDireito = [18, 17, 16, 15, 14, 13, 12, 11];
 const superiorEsquerdo = [21, 22, 23, 24, 25, 26, 27, 28];
 const inferiorEsquerdo = [31, 32, 33, 34, 35, 36, 37, 38];
 const inferiorDireito = [48, 47, 46, 45, 44, 43, 42, 41];
 
-type Estado = "saudavel" | "restaurado" | "cariado" | "extraido" | "tratamento";
+type Estado = OdontogramaEstado;
 
 const estadoCor: Record<Estado, { bg: string; border: string; label: string }> = {
   saudavel: { bg: "fill-white", border: "stroke-sage-200", label: "Saudável" },
@@ -18,14 +27,7 @@ const estadoCor: Record<Estado, { bg: string; border: string; label: string }> =
   tratamento: { bg: "fill-rose-200", border: "stroke-rose-400", label: "Em tratamento" },
 };
 
-const estadosIniciais: Record<number, Estado> = {
-  16: "restaurado",
-  15: "restaurado",
-  14: "cariado",
-  26: "tratamento",
-  36: "restaurado",
-  46: "extraido",
-};
+const estadosIniciais: Record<number, Estado> = {};
 
 function Dente({
   numero,
@@ -83,11 +85,21 @@ function Dente({
   );
 }
 
-export function Odontograma() {
-  const [estados, setEstados] =
-    useState<Record<number, Estado>>(estadosIniciais);
+export function Odontograma({
+  value,
+  onChange,
+  readOnly = false,
+}: {
+  value?: OdontogramaState;
+  onChange?: (next: OdontogramaState) => void;
+  readOnly?: boolean;
+} = {}) {
+  const [internal, setInternal] = useState<OdontogramaState>(estadosIniciais);
+  const controlled = value !== undefined;
+  const estados = controlled ? (value as OdontogramaState) : internal;
 
   const ciclar = (n: number) => {
+    if (readOnly) return;
     const ordem: Estado[] = [
       "saudavel",
       "restaurado",
@@ -97,7 +109,9 @@ export function Odontograma() {
     ];
     const atual = estados[n] || "saudavel";
     const idx = (ordem.indexOf(atual) + 1) % ordem.length;
-    setEstados({ ...estados, [n]: ordem[idx] });
+    const next = { ...estados, [n]: ordem[idx] };
+    if (!controlled) setInternal(next);
+    onChange?.(next);
   };
 
   return (

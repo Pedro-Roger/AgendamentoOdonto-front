@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { adminApi } from "@/src/lib/frontend-api";
+import { Odontograma } from "@/components/Odontograma";
 
 type Draft = {
   assessment: string;
@@ -161,6 +162,10 @@ function ProntuarioPageInner() {
           {success}
         </div>
       )}
+
+      <div className="mb-6">
+        <Odontograma />
+      </div>
 
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-2 bg-white border border-sage-100 rounded-3xl p-6 space-y-5">

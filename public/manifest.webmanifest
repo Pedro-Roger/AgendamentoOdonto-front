@@ -1,0 +1,14 @@
+{
+  "name": "Sorriso · Sistema Odontológico",
+  "short_name": "Sorriso",
+  "description": "Gestão clínica acolhedora para dentistas: agendamento, prontuário, anamnese e assinatura.",
+  "start_url": "/login",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fffdf7",
+  "theme_color": "#fffdf7",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/sorriso.png", "type": "image/png", "sizes": "any", "purpose": "any" }
+  ]
+}

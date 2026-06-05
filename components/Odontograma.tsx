@@ -33,16 +33,18 @@ function Dente({
   numero,
   estado,
   onClick,
+  inferior = false,
 }: {
   numero: number;
   estado: Estado;
   onClick: () => void;
+  inferior?: boolean;
 }) {
   const cor = estadoCor[estado];
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-1 group"
+      className={`flex flex-col items-center gap-1 group ${inferior ? "flex-col-reverse" : ""}`}
     >
       <span className="text-[9px] text-ink-400 group-hover:text-ink-700 font-mono">
         {numero}
@@ -51,7 +53,7 @@ function Dente({
         width="28"
         height="36"
         viewBox="0 0 28 36"
-        className="transition-transform group-hover:scale-110"
+        className={`transition-transform group-hover:scale-110 ${inferior ? "rotate-180" : ""}`}
       >
         {/* Coroa */}
         <path
@@ -116,9 +118,9 @@ export function Odontograma({
 
   return (
     <div className="bg-cream-50 border border-sage-100 rounded-2xl p-5">
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <h4 className="text-sm font-medium text-ink-700">Odontograma</h4>
-        <div className="flex items-center gap-3 text-[10px]">
+        <div className="flex items-center gap-3 text-[10px] flex-wrap">
           {Object.entries(estadoCor).map(([k, v]) => (
             <div key={k} className="flex items-center gap-1.5">
               <div
@@ -130,9 +132,9 @@ export function Odontograma({
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3 overflow-x-auto">
         {/* Arcada superior */}
-        <div className="flex justify-center gap-1.5 pb-2 border-b border-dashed border-sage-200">
+        <div className="flex justify-center gap-1.5 pb-2 border-b border-dashed border-sage-200 min-w-[540px]">
           {superiorDireito.map((n) => (
             <Dente
               key={n}
@@ -153,25 +155,25 @@ export function Odontograma({
         </div>
 
         {/* Arcada inferior - invertida */}
-        <div className="flex justify-center gap-1.5 pt-2">
+        <div className="flex justify-center gap-1.5 pt-2 min-w-[540px]">
           {inferiorDireito.map((n) => (
-            <div key={n} className="rotate-180">
-              <Dente
-                numero={n}
-                estado={estados[n] || "saudavel"}
-                onClick={() => ciclar(n)}
-              />
-            </div>
+            <Dente
+              key={n}
+              numero={n}
+              estado={estados[n] || "saudavel"}
+              onClick={() => ciclar(n)}
+              inferior
+            />
           ))}
           <div className="w-3"></div>
           {inferiorEsquerdo.map((n) => (
-            <div key={n} className="rotate-180">
-              <Dente
-                numero={n}
-                estado={estados[n] || "saudavel"}
-                onClick={() => ciclar(n)}
-              />
-            </div>
+            <Dente
+              key={n}
+              numero={n}
+              estado={estados[n] || "saudavel"}
+              onClick={() => ciclar(n)}
+              inferior
+            />
           ))}
         </div>
       </div>

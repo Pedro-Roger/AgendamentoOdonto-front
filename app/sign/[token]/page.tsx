@@ -20,7 +20,7 @@ export default async function SignPage({ params }: { params: Promise<{ token: st
           <p className="text-xs text-ink-400 tracking-wide uppercase">Assinatura eletrônica</p>
         </div>
 
-        <div className="bg-white border border-sage-100 rounded-3xl shadow-card p-8">
+        <div className="bg-white border border-sage-100 rounded-3xl shadow-card p-5 sm:p-8">
           <div className="flex items-start gap-4 mb-6">
             <div className="w-12 h-12 rounded-2xl bg-sage-100 text-sage-600 flex items-center justify-center shrink-0">
               <FileSignature size={22} />

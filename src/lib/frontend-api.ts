@@ -10,7 +10,14 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   const raw = await response.text();
-  const data = raw ? JSON.parse(raw) : null;
+  let data: any = null;
+  if (raw) {
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      throw new Error(`Erro de comunicação com o servidor (status ${response.status})`);
+    }
+  }
   if (response.status === 401) {
     if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
       window.location.href = '/login';
@@ -35,9 +42,11 @@ export const adminApi = {
   getFormSettings: () => req<{ id: string; fields: FormFieldDto[]; createdAt: string }>('api/form-settings'),
   createFormSettings: (fields: FormFieldDto[]) => req('api/form-settings', { method: 'POST', body: JSON.stringify({ fields }) }),
 
-  createMedicalRecord: (body: { appointmentId: string; content: Record<string, unknown> }) => req('api/medical-records', { method: 'POST', body: JSON.stringify(body) }),
+  createMedicalRecord: (body: { patientId: string; content: Record<string, unknown> }) => req('api/medical-records', { method: 'POST', body: JSON.stringify(body) }),
+  getMedicalRecordByPatient: (patientId: string) => req(`api/medical-records/patient/${patientId}`),
   duplicateMedicalRecord: (id: string) => req(`api/medical-records/${id}/duplicate`, { method: 'POST' }),
   getMedicalRecord: (id: string) => req(`api/medical-records/${id}`),
+  listMedicalAttachments: (recordId: string) => req(`api/medical-records/${recordId}/attachments`),
   uploadMedicalAttachment: (id: string, file: File) => {
     const form = new FormData();
     form.append('file', file);
@@ -54,21 +63,43 @@ export const adminApi = {
 
   listPatients: (q?: string) => req<PatientDto[]>(`api/patients${q ? `?q=${encodeURIComponent(q)}` : ''}`),
   listAppointments: (date?: string) => req<AppointmentListItemDto[]>(`api/appointments${date ? `?date=${encodeURIComponent(date)}` : ''}`),
+  listAppointmentsWeek: (from: string, to: string) => req<AppointmentListItemDto[]>(`api/appointments/week?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`),
   patientProfile: (id: string) => req(`api/patients/${id}/profile`),
   patientTimeline: (id: string) => req(`api/patients/${id}/timeline`),
 
   listUsers: () => req<UserAdminDto[]>('api/users'),
-  createUser: (body: { name: string; email: string; password: string; role: 'MASTER' | 'ADMIN' }) =>
+  createUser: (body: { name: string; email: string; password: string; role: 'MASTER' | 'ADMIN' | 'DENTISTA' | 'RECEPCIONISTA' }) =>
     req<UserAdminDto>('api/users', { method: 'POST', body: JSON.stringify(body) }),
-  updateUser: (id: string, body: Partial<{ name: string; email: string; password: string; role: 'MASTER' | 'ADMIN'; isActive: boolean }>) =>
+  updateUser: (id: string, body: Partial<{ name: string; email: string; password: string; role: 'MASTER' | 'ADMIN' | 'DENTISTA' | 'RECEPCIONISTA'; isActive: boolean }>) =>
     req<UserAdminDto>(`api/users/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+
+  getWhatsAppConfig: () => req('api/whatsapp/config'),
+  saveWhatsAppConfig: (body: { instanceId: string; token: string; clinicName: string; clinicAddress: string; isActive: boolean }) =>
+    req('api/whatsapp/config', { method: 'POST', body: JSON.stringify(body) }),
+  testWhatsApp: (phone: string) =>
+    req<{ sent: boolean }>('api/whatsapp/test', { method: 'POST', body: JSON.stringify({ phone }) }),
+
+  listNotifications: () => req<NotificationDto[]>('api/notifications'),
+  unreadNotifications: () => req<NotificationDto[]>('api/notifications/unread'),
+  markNotificationRead: (id: string) => req(`api/notifications/${id}/read`, { method: 'PATCH' }),
+  markAllNotificationsRead: () => req('api/notifications/read-all', { method: 'PATCH' }),
+};
+
+export type NotificationDto = {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  data: any;
+  readAt: string | null;
+  createdAt: string;
 };
 
 export type UserAdminDto = {
   id: string;
   name: string;
   email: string;
-  role: 'MASTER' | 'ADMIN';
+  role: 'MASTER' | 'ADMIN' | 'DENTISTA' | 'RECEPCIONISTA';
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -76,7 +107,7 @@ export type UserAdminDto = {
 
 export const publicApi = {
   availableSchedules: (serviceId: string, date: string) => req<ScheduleDto[]>(`api/public/available-schedules?serviceId=${encodeURIComponent(serviceId)}&date=${encodeURIComponent(date)}`),
-  createAppointment: (body: { name: string; cpf: string; email: string; phone: string; serviceId: string; date: string; time: string; anamnesisAnswers: Array<{ key: string; value: string }> }) =>
+  createAppointment: (body: { name: string; cpf: string; email: string; phone: string; serviceId: string; date: string; time: string; reason?: string; anamnesisAnswers: Array<{ key: string; value: string }> }) =>
     req<AppointmentDto>('api/public/appointments', { method: 'POST', body: JSON.stringify(body) }),
 };
 

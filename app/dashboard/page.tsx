@@ -80,7 +80,7 @@ export default function Dashboard() {
         actionSlot={<NewAppointmentButton />}
       />
 
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {stats.map((s, i) => {
           const Icon = s.icon;
           return (
@@ -96,7 +96,7 @@ export default function Dashboard() {
                   <Icon size={18} strokeWidth={2} />
                 </div>
               </div>
-              <div className="font-display text-3xl text-ink-700 leading-none mb-1">
+              <div className="font-display text-2xl lg:text-3xl text-ink-700 leading-none mb-1">
                 {s.value}
               </div>
               <div className="text-sm text-ink-500 mt-2">{s.label}</div>
@@ -153,6 +153,11 @@ export default function Dashboard() {
                   <div className="text-xs text-ink-400 truncate">
                     {a.service.name}
                   </div>
+                  {a.reason && (
+                    <div className="text-xs text-ink-400 mt-0.5 truncate italic">
+                      {a.reason}
+                    </div>
+                  )}
                 </div>
               </li>
             ))}

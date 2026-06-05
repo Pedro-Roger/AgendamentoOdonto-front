@@ -89,7 +89,8 @@ export default function ServicosPage() {
             </p>
           </div>
         ) : (
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[500px]">
             <thead>
               <tr className="text-left text-xs text-ink-400 uppercase tracking-wider">
                 <th className="px-6 py-3 font-medium">Serviço</th>
@@ -142,6 +143,7 @@ export default function ServicosPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 

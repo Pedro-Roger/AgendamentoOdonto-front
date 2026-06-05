@@ -121,8 +121,8 @@ export default function AnamnesePage() {
         </div>
       )}
 
-      <div className="grid grid-cols-4 gap-6">
-        <div className="bg-white border border-sage-100 rounded-3xl p-5 h-fit sticky top-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="bg-white border border-sage-100 rounded-3xl p-5 h-fit lg:sticky lg:top-6">
           <h3 className="font-display text-base text-ink-700 mb-1">Adicionar campo</h3>
           <p className="text-xs text-ink-400 mb-4">Clique para inserir.</p>
 
@@ -146,14 +146,14 @@ export default function AnamnesePage() {
           </div>
         </div>
 
-        <div className="col-span-3">
+        <div className="col-span-1 lg:col-span-3">
           <div className="bg-white border border-sage-100 rounded-3xl p-7">
             <div className="pb-6 mb-6 border-b border-sage-100">
               <h1 className="font-display text-2xl text-ink-700 mb-1">
                 Formulário de anamnese
               </h1>
               <p className="text-sm text-ink-500">
-                Configure as perguntas que o paciente responderá no agendamento.
+                Configure as perguntas da anamnese preenchida pelo dentista no prontuário.
               </p>
             </div>
 

@@ -76,7 +76,7 @@ export default function PacientesPage() {
           <p className="text-sm text-ink-500">Nenhum paciente encontrado.</p>
         </div>
       ) : (
-        <ul className="grid grid-cols-2 gap-3">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {(patients ?? []).map((p) => (
             <li key={p.id}>
               <Link

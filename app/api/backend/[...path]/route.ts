@@ -34,6 +34,8 @@ async function proxy(request: Request, pathParts: string[]) {
   const responseBody = await response.arrayBuffer();
   const outHeaders = new Headers(response.headers);
   outHeaders.delete('content-encoding');
+  outHeaders.delete('transfer-encoding');
+  outHeaders.delete('content-length');
 
   return new NextResponse(responseBody, {
     status: response.status,

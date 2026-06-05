@@ -52,6 +52,15 @@ const config: Config = {
         soft: "0 4px 20px -8px rgba(19, 110, 137, 0.18)",
         card: "0 8px 32px -12px rgba(19, 110, 137, 0.22)",
       },
+      keyframes: {
+        slideIn: {
+          from: { transform: "translateX(-100%)" },
+          to: { transform: "translateX(0)" },
+        },
+      },
+      animation: {
+        slideIn: "slideIn 0.2s ease-out",
+      },
     },
   },
   plugins: [],

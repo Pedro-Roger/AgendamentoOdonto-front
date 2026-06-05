@@ -48,6 +48,7 @@ export type AppointmentListItemDto = {
   id: string;
   date: string;
   time: string;
+  reason?: string;
   patient: { id: string; name: string; cpf: string; email: string; phone: string };
   service: { id: string; name: string; durationMinutes: number };
 };

@@ -18,11 +18,13 @@ import {
 } from "lucide-react";
 import { adminApi, type UserAdminDto } from "@/src/lib/frontend-api";
 
-type Role = "MASTER" | "ADMIN";
+type Role = "MASTER" | "ADMIN" | "DENTISTA" | "RECEPCIONISTA";
 
 const roleLabel: Record<Role, string> = {
   MASTER: "Master",
   ADMIN: "Administradora",
+  DENTISTA: "Dentista",
+  RECEPCIONISTA: "Recepcionista",
 };
 
 export default function UsuariosPage() {
@@ -123,7 +125,8 @@ export default function UsuariosPage() {
             </p>
           </div>
         ) : (
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px]">
             <thead>
               <tr className="text-left text-xs text-ink-400 uppercase tracking-wider">
                 <th className="px-6 py-3 font-medium">Nome</th>
@@ -210,6 +213,7 @@ export default function UsuariosPage() {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 
@@ -379,6 +383,8 @@ function UserModal({
               onChange={(e) => setRole(e.target.value as Role)}
               className="w-full px-3.5 py-2.5 bg-cream-50 border border-sage-100 rounded-2xl text-sm focus:outline-none focus:border-sage-300 focus:bg-white disabled:opacity-60"
             >
+              <option value="RECEPCIONISTA">Recepcionista</option>
+              <option value="DENTISTA">Dentista</option>
               <option value="ADMIN">Administradora</option>
               <option value="MASTER">Master</option>
             </select>

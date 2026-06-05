@@ -217,13 +217,13 @@ export default function HorariosPage() {
             <div
               key={d.weekDay}
               data-testid={`day-row-${d.weekDay}`}
-              className={`flex items-center gap-6 p-4 rounded-2xl border transition-all ${
+              className={`flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 p-4 rounded-2xl border transition-all ${
                 d.active
                   ? "bg-cream-100 border-sage-100"
                   : "bg-cream-50 border-transparent opacity-60"
               }`}
             >
-              <label className="flex items-center gap-3 w-32 shrink-0 cursor-pointer">
+              <label className="flex items-center gap-3 w-full sm:w-32 shrink-0 cursor-pointer">
                 <button
                   type="button"
                   onClick={() => toggleDay(d.weekDay)}

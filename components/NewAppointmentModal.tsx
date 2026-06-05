@@ -44,6 +44,7 @@ export function NewAppointmentModal({ open, onClose, onCreated }: Props) {
   const [serviceId, setServiceId] = useState("");
   const [date, setDate] = useState(todayIso());
   const [time, setTime] = useState("");
+  const [reason, setReason] = useState("");
 
   useEffect(() => {
     if (!open) return;
@@ -94,6 +95,7 @@ export function NewAppointmentModal({ open, onClose, onCreated }: Props) {
     setServiceId("");
     setDate(todayIso());
     setTime("");
+    setReason("");
     setSlots([]);
     setError(null);
   }
@@ -112,6 +114,7 @@ export function NewAppointmentModal({ open, onClose, onCreated }: Props) {
         serviceId,
         date,
         time,
+        reason: reason.trim(),
         anamnesisAnswers: [],
       });
       reset();
@@ -152,7 +155,7 @@ export function NewAppointmentModal({ open, onClose, onCreated }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Nome completo">
               <input
                 value={name}
@@ -259,6 +262,17 @@ export function NewAppointmentModal({ open, onClose, onCreated }: Props) {
               </div>
             )}
           </div>
+
+          <Field label="Motivo da consulta (opcional)">
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              maxLength={500}
+              rows={2}
+              className={inputCls}
+              placeholder="Descreva brevemente o motivo da consulta…"
+            />
+          </Field>
 
           {error && (
             <div className="text-xs text-rose-500 bg-rose-100 rounded-2xl px-3 py-2">

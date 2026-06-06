@@ -78,7 +78,7 @@ export const adminApi = {
 
   getWhatsAppStatus: () => req<{ status: string; qr: string | null }>('api/whatsapp/status'),
   getWhatsAppConfig: () => req('api/whatsapp/config'),
-  saveWhatsAppConfig: (body: { instanceId: string; token: string; clinicName: string; clinicAddress: string; isActive: boolean }) =>
+  saveWhatsAppConfig: (body: { clinicName: string; clinicAddress: string }) =>
     req('api/whatsapp/config', { method: 'POST', body: JSON.stringify(body) }),
   resetWhatsAppSession: () => req('api/whatsapp/session', { method: 'DELETE' }),
   testWhatsApp: (phone: string) =>

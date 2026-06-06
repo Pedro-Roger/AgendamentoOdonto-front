@@ -68,10 +68,8 @@ export default function IntegracoesPage() {
     setSaving(true);
     try {
       await adminApi.saveWhatsAppConfig({
-        instanceId: "", token: "",
         clinicName: clinicName.trim(),
         clinicAddress: clinicAddress.trim(),
-        isActive: true,
       });
       setSuccess("Configuração salva.");
     } catch (e: any) {

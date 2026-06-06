@@ -31,7 +31,14 @@ describe("SDD Phase 3 / Slice 6 — Prontuário editor", () => {
     vi.mocked(adminApi.listMedicalAttachments).mockResolvedValue([] as any);
   });
 
-  it("renders draft form with bound inputs and saves via createMedicalRecord", async () => {
+  it("renders structured vitals fields (PA sistólica/diastólica + temperatura)", async () => {
+    render(<ProntuarioPage />);
+    expect(screen.getByLabelText(/sist[oó]lica/i)).toBeDefined();
+    expect(screen.getByLabelText(/diast[oó]lica/i)).toBeDefined();
+    expect(screen.getByLabelText(/temperatura/i)).toBeDefined();
+  });
+
+  it("saves vitals as structured object with paSistolica, paDiastolica, temperatura", async () => {
     vi.mocked(adminApi.createMedicalRecord).mockResolvedValue({ id: "rec1" } as any);
 
     render(<ProntuarioPage />);
@@ -39,7 +46,9 @@ describe("SDD Phase 3 / Slice 6 — Prontuário editor", () => {
     fireEvent.change(screen.getByLabelText(/avalia[çc][ãa]o/i), { target: { value: "Cárie em #16" } });
     fireEvent.change(screen.getByLabelText(/procedimentos/i), { target: { value: "Restauração resina" } });
     fireEvent.change(screen.getByLabelText(/plano de tratamento/i), { target: { value: "Retorno em 30 dias" } });
-    fireEvent.change(screen.getByLabelText(/sinais vitais/i), { target: { value: "PA 120/80" } });
+    fireEvent.change(screen.getByLabelText(/sist[oó]lica/i), { target: { value: "130" } });
+    fireEvent.change(screen.getByLabelText(/diast[oó]lica/i), { target: { value: "85" } });
+    fireEvent.change(screen.getByLabelText(/temperatura/i), { target: { value: "36.8" } });
 
     fireEvent.click(screen.getByRole("button", { name: /salvar prontu[áa]rio/i }));
 
@@ -51,21 +60,25 @@ describe("SDD Phase 3 / Slice 6 — Prontuário editor", () => {
             assessment: "Cárie em #16",
             procedures: "Restauração resina",
             treatmentPlan: "Retorno em 30 dias",
-            vitals: "PA 120/80",
+            vitals: expect.objectContaining({
+              paSistolica: "130",
+              paDiastolica: "85",
+              temperatura: "36.8",
+            }),
           }),
         })
       );
     });
   });
 
-  it("pre-fills form when patient has existing record", async () => {
+  it("pre-fills vitals fields from existing record", async () => {
     vi.mocked(adminApi.getMedicalRecordByPatient).mockResolvedValue({
       id: "rec_existing",
       content: {
         assessment: "Avaliação anterior",
         procedures: "Limpeza",
         treatmentPlan: "Retorno em 6 meses",
-        vitals: "PA 120/80",
+        vitals: { paSistolica: "120", paDiastolica: "80", temperatura: "37.0" },
         odontogram: {},
         anamnesis: [],
       },
@@ -74,8 +87,9 @@ describe("SDD Phase 3 / Slice 6 — Prontuário editor", () => {
     render(<ProntuarioPage />);
 
     await waitFor(() => {
-      const el = screen.getByLabelText(/avalia[çc][ãa]o/i) as HTMLTextAreaElement;
-      expect(el.value).toBe("Avaliação anterior");
+      expect((screen.getByLabelText(/sist[oó]lica/i) as HTMLInputElement).value).toBe("120");
+      expect((screen.getByLabelText(/diast[oó]lica/i) as HTMLInputElement).value).toBe("80");
+      expect((screen.getByLabelText(/temperatura/i) as HTMLInputElement).value).toBe("37.0");
     });
   });
 

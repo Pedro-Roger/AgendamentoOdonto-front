@@ -20,11 +20,17 @@ import { adminApi } from "@/src/lib/frontend-api";
 import { Odontograma, type OdontogramaState } from "@/components/Odontograma";
 import type { FormFieldDto } from "@/src/types/dto";
 
+type Vitals = {
+  paSistolica: string;
+  paDiastolica: string;
+  temperatura: string;
+};
+
 type Draft = {
   assessment: string;
   procedures: string;
   treatmentPlan: string;
-  vitals: string;
+  vitals: Vitals;
 };
 
 
@@ -56,7 +62,7 @@ function ProntuarioPageInner() {
     assessment: "",
     procedures: "",
     treatmentPlan: "",
-    vitals: "",
+    vitals: { paSistolica: "", paDiastolica: "", temperatura: "" },
   });
   const [recordId, setRecordId] = useState<string | null>(null);
   const [odontogram, setOdontogram] = useState<OdontogramaState>({});
@@ -87,11 +93,20 @@ function ProntuarioPageInner() {
         setRecordId(rec.id);
         const content = rec.content as Record<string, any> | null;
         if (!content) return;
+        const rawVitals = content.vitals;
+        const vitals: Vitals =
+          rawVitals && typeof rawVitals === "object"
+            ? {
+                paSistolica: rawVitals.paSistolica ?? "",
+                paDiastolica: rawVitals.paDiastolica ?? "",
+                temperatura: rawVitals.temperatura ?? "",
+              }
+            : { paSistolica: "", paDiastolica: "", temperatura: "" };
         setDraft({
           assessment: content.assessment ?? "",
           procedures: content.procedures ?? "",
           treatmentPlan: content.treatmentPlan ?? "",
-          vitals: content.vitals ?? "",
+          vitals,
         });
         const odo = content.odontogram;
         if (odo && typeof odo === "object") setOdontogram(odo as OdontogramaState);
@@ -116,11 +131,20 @@ function ProntuarioPageInner() {
     if (recordId) loadAttachments(recordId);
   }, [recordId]);
 
-  function bind<K extends keyof Draft>(key: K) {
+  function bind<K extends keyof Omit<Draft, "vitals">>(key: K) {
     return {
-      value: draft[key],
+      value: draft[key] as string,
       onChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
         setDraft((d) => ({ ...d, [key]: e.target.value })),
+    };
+  }
+
+  function bindVital(key: keyof Vitals) {
+    return {
+      id: `pr-vital-${key}`,
+      value: draft.vitals[key],
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+        setDraft((d) => ({ ...d, vitals: { ...d.vitals, [key]: e.target.value } })),
     };
   }
 
@@ -251,8 +275,42 @@ function ProntuarioPageInner() {
           <Field id="pr-plan" label="Plano de tratamento">
             <textarea id="pr-plan" {...bind("treatmentPlan")} className={textareaCls} rows={3} />
           </Field>
-          <Field id="pr-vitals" label="Sinais vitais">
-            <input id="pr-vitals" {...bind("vitals")} className={inputCls} />
+          <div>
+            <span className="block text-xs font-medium text-ink-500 mb-2">Pressão arterial</span>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <label htmlFor="pr-vital-paSistolica" className="block text-[11px] text-ink-400 mb-1">
+                  Sistólica (mmHg)
+                </label>
+                <input
+                  {...bindVital("paSistolica")}
+                  inputMode="numeric"
+                  placeholder="120"
+                  className={inputCls}
+                />
+              </div>
+              <span className="text-ink-400 font-medium pt-5">/</span>
+              <div className="flex-1">
+                <label htmlFor="pr-vital-paDiastolica" className="block text-[11px] text-ink-400 mb-1">
+                  Diastólica (mmHg)
+                </label>
+                <input
+                  {...bindVital("paDiastolica")}
+                  inputMode="numeric"
+                  placeholder="80"
+                  className={inputCls}
+                />
+              </div>
+            </div>
+          </div>
+
+          <Field id="pr-vital-temperatura" label="Temperatura (°C)">
+            <input
+              {...bindVital("temperatura")}
+              inputMode="decimal"
+              placeholder="36.5"
+              className={inputCls}
+            />
           </Field>
 
           <div className="flex justify-end gap-2 pt-2">

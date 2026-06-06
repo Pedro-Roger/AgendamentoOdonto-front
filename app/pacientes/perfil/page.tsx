@@ -16,11 +16,15 @@ import {
   FileText,
   Paperclip,
   ExternalLink,
+  Plus,
+  ClipboardEdit,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { adminApi } from "@/src/lib/frontend-api";
 
 type AttachmentDto = { id: string; fileUrl: string; category?: string };
 type AnamnesisEntry = { key: string; label: string; value: string };
+type MedicalRecordDto = { id: string; updatedAt: string; createdAt: string; version: number };
 
 const CATEGORY_LABELS: Record<string, string> = {
   MEDICAL_ATTACHMENT: "Anexo",
@@ -73,11 +77,13 @@ export default function PerfilPage() {
 
 function PerfilPageInner() {
   const params = useSearchParams();
+  const router = useRouter();
   const id = params.get("id") ?? "";
   const [profile, setProfile] = useState<ProfileDto | null>(null);
   const [timeline, setTimeline] = useState<TimelineEvent[] | null>(null);
   const [anamnesis, setAnamnesis] = useState<AnamnesisEntry[] | null>(null);
   const [attachments, setAttachments] = useState<AttachmentDto[]>([]);
+  const [prontuarios, setProntuarios] = useState<MedicalRecordDto[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -106,6 +112,10 @@ function PerfilPageInner() {
         }
       })
       .catch(() => {});
+    adminApi
+      .listMedicalRecordsByPatient(id)
+      .then((list) => setProntuarios(list ?? []))
+      .catch(() => setProntuarios([]));
   }, [id]);
 
   return (
@@ -208,34 +218,100 @@ function PerfilPageInner() {
           )}
         </div>
 
-        <div className="col-span-1 lg:col-span-2 bg-white border border-sage-100 rounded-3xl p-6">
-          <h2 className="font-display text-lg text-ink-700 mb-4">Histórico</h2>
-          {timeline && timeline.length === 0 ? (
-            <p className="text-sm text-ink-400">Nenhum evento registrado.</p>
-          ) : (
-            <ul className="space-y-3">
-              {(timeline ?? []).map((ev) => {
-                const Icon = iconFor(ev.type);
-                return (
+        <div className="col-span-1 lg:col-span-2 space-y-5">
+          {/* Prontuários section */}
+          <div className="bg-white border border-sage-100 rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <ClipboardEdit size={16} className="text-sage-600" />
+                <h2 className="font-display text-lg text-ink-700">Prontuários</h2>
+              </div>
+              <button
+                onClick={() => router.push(`/prontuario?patientId=${id}`)}
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-sage-400 text-white rounded-xl hover:bg-sage-500 transition-colors"
+              >
+                <Plus size={12} />
+                Novo prontuário
+              </button>
+            </div>
+
+            {prontuarios === null ? (
+              <p className="text-sm text-ink-400">Carregando…</p>
+            ) : prontuarios.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-sage-50 flex items-center justify-center mb-3">
+                  <ClipboardEdit size={20} className="text-sage-300" />
+                </div>
+                <p className="text-sm text-ink-500 mb-1">Não há prontuários</p>
+                <p className="text-xs text-ink-400">Crie o primeiro prontuário para este paciente</p>
+              </div>
+            ) : (
+              <ul className="space-y-2">
+                {prontuarios.map((p, i) => (
                   <li
-                    key={ev.id}
-                    className="flex items-start gap-3 p-3 rounded-2xl hover:bg-cream-100 transition-colors"
+                    key={p.id}
+                    className="flex items-center gap-3 p-3 rounded-2xl hover:bg-cream-100 transition-colors"
                   >
                     <div className="w-9 h-9 rounded-xl bg-sage-100 text-sage-600 flex items-center justify-center shrink-0">
-                      <Icon size={16} />
+                      <ClipboardEdit size={15} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-ink-700">{ev.title}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-ink-700">
+                          Prontuário {prontuarios.length - i}
+                        </span>
+                        {i === 0 && (
+                          <span className="text-[10px] px-1.5 py-0.5 bg-sage-100 text-sage-600 rounded-full">
+                            Atual
+                          </span>
+                        )}
+                      </div>
                       <div className="text-xs text-ink-400">
-                        {ev.date}
-                        {ev.status ? ` · ${ev.status}` : ""}
+                        Atualizado em {new Date(p.updatedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })}
                       </div>
                     </div>
+                    <button
+                      onClick={() => router.push(`/prontuario?patientId=${id}`)}
+                      className="text-xs px-3 py-1.5 bg-cream-100 hover:bg-cream-200 rounded-xl text-ink-600 transition-colors shrink-0"
+                    >
+                      Abrir
+                    </button>
                   </li>
-                );
-              })}
-            </ul>
-          )}
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Timeline / Histórico */}
+          <div className="bg-white border border-sage-100 rounded-3xl p-6">
+            <h2 className="font-display text-lg text-ink-700 mb-4">Histórico</h2>
+            {timeline && timeline.length === 0 ? (
+              <p className="text-sm text-ink-400">Nenhum evento registrado.</p>
+            ) : (
+              <ul className="space-y-3">
+                {(timeline ?? []).map((ev) => {
+                  const Icon = iconFor(ev.type);
+                  return (
+                    <li
+                      key={ev.id}
+                      className="flex items-start gap-3 p-3 rounded-2xl hover:bg-cream-100 transition-colors"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-sage-100 text-sage-600 flex items-center justify-center shrink-0">
+                        <Icon size={16} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-ink-700">{ev.title}</div>
+                        <div className="text-xs text-ink-400">
+                          {ev.date}
+                          {ev.status ? ` · ${ev.status}` : ""}
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </AppShell>

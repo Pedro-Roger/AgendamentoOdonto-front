@@ -44,6 +44,15 @@ export type AppointmentDto = {
   time: string;
 };
 
+export type MedicalRecordDto = {
+  id: string;
+  patientId: string;
+  content: Record<string, unknown>;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AppointmentListItemDto = {
   id: string;
   date: string;

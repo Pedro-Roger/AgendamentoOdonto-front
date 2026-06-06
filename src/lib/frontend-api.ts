@@ -1,4 +1,4 @@
-import { AppointmentDto, AppointmentListItemDto, FormFieldDto, PatientDto, ScheduleDto, ServiceDto } from '../types/dto';
+import { AppointmentDto, AppointmentListItemDto, FormFieldDto, MedicalRecordDto, PatientDto, ScheduleDto, ServiceDto } from '../types/dto';
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`/api/backend/${path}`, {
@@ -44,8 +44,11 @@ export const adminApi = {
 
   createMedicalRecord: (body: { patientId: string; content: Record<string, unknown> }) => req('api/medical-records', { method: 'POST', body: JSON.stringify(body) }),
   getMedicalRecordByPatient: (patientId: string) => req(`api/medical-records/patient/${patientId}`),
+  listMedicalRecordsByPatient: (patientId: string) => req<MedicalRecordDto[]>(`api/medical-records/patient/${patientId}/history`),
+  createNewMedicalRecord: (patientId: string, content: Record<string, unknown>) => req<MedicalRecordDto>(`api/medical-records/patient/${patientId}/new`, { method: 'POST', body: JSON.stringify({ content }) }),
+  updateMedicalRecord: (id: string, content: Record<string, unknown>) => req<MedicalRecordDto>(`api/medical-records/${id}`, { method: 'PATCH', body: JSON.stringify({ content }) }),
   duplicateMedicalRecord: (id: string) => req(`api/medical-records/${id}/duplicate`, { method: 'POST' }),
-  getMedicalRecord: (id: string) => req(`api/medical-records/${id}`),
+  getMedicalRecord: (id: string) => req<MedicalRecordDto>(`api/medical-records/${id}`),
   listMedicalAttachments: (recordId: string) => req(`api/medical-records/${recordId}/attachments`),
   uploadMedicalAttachment: (id: string, file: File) => {
     const form = new FormData();

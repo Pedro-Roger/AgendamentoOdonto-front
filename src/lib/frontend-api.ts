@@ -73,9 +73,11 @@ export const adminApi = {
   updateUser: (id: string, body: Partial<{ name: string; email: string; password: string; role: 'MASTER' | 'ADMIN' | 'DENTISTA' | 'RECEPCIONISTA'; isActive: boolean }>) =>
     req<UserAdminDto>(`api/users/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
 
+  getWhatsAppStatus: () => req<{ status: string; qr: string | null }>('api/whatsapp/status'),
   getWhatsAppConfig: () => req('api/whatsapp/config'),
   saveWhatsAppConfig: (body: { instanceId: string; token: string; clinicName: string; clinicAddress: string; isActive: boolean }) =>
     req('api/whatsapp/config', { method: 'POST', body: JSON.stringify(body) }),
+  resetWhatsAppSession: () => req('api/whatsapp/session', { method: 'DELETE' }),
   testWhatsApp: (phone: string) =>
     req<{ sent: boolean }>('api/whatsapp/test', { method: 'POST', body: JSON.stringify({ phone }) }),
 

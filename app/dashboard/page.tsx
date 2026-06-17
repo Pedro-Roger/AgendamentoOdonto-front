@@ -3,68 +3,33 @@
 import { AppShell } from "@/components/AppShell";
 import { Topbar } from "@/components/Topbar";
 import { NewAppointmentButton } from "@/components/NewAppointmentButton";
-import {
-  CalendarDays,
-  Users,
-  ClipboardCheck,
-  TrendingUp,
-  CalendarX,
-} from "lucide-react";
+import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
+import { CalendarX } from "lucide-react";
 import { useEffect, useState } from "react";
-import { adminApi } from "@/src/lib/frontend-api";
-import type {
-  AppointmentListItemDto,
-  PatientDto,
-  ServiceDto,
-} from "@/src/types/dto";
-
-const toneMap: Record<string, string> = {
-  sage: "bg-sage-100 text-sage-600",
-  peach: "bg-peach-100 text-peach-500",
-  rose: "bg-rose-100 text-rose-400",
-};
+import { adminApi, dashboardApi } from "@/src/lib/frontend-api";
+import type { DashboardSummary } from "@/src/lib/frontend-api";
+import type { AppointmentListItemDto } from "@/src/types/dto";
 
 export default function Dashboard() {
-  const [patients, setPatients] = useState<PatientDto[] | null>(null);
-  const [services, setServices] = useState<ServiceDto[] | null>(null);
   const [appointments, setAppointments] = useState<AppointmentListItemDto[] | null>(null);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [windowDays, setWindowDays] = useState<7 | 30>(30);
 
   useEffect(() => {
-    adminApi.listPatients().then(setPatients).catch(() => setPatients([]));
-    adminApi.listServices().then(setServices).catch(() => setServices([]));
     adminApi.listAppointments().then(setAppointments).catch(() => setAppointments([]));
   }, []);
 
-  const stats = [
-    {
-      label: "Atendimentos hoje",
-      value: appointments ? String(appointments.length) : "…",
-      sub: appointments && appointments.length === 0 ? "Nenhum hoje" : "Agendados",
-      icon: CalendarDays,
-      tone: "sage" as const,
-    },
-    {
-      label: "Pacientes ativos",
-      value: patients ? String(patients.length) : "…",
-      sub: patients && patients.length === 0 ? "Nenhum paciente ainda" : "Total cadastrados",
-      icon: Users,
-      tone: "peach" as const,
-    },
-    {
-      label: "Serviços ativos",
-      value: services ? String(services.filter((s) => s.isActive).length) : "…",
-      sub: "Configurados na clínica",
-      icon: ClipboardCheck,
-      tone: "rose" as const,
-    },
-    {
-      label: "Taxa de retorno",
-      value: "—",
-      sub: "Sem dados suficientes",
-      icon: TrendingUp,
-      tone: "sage" as const,
-    },
-  ];
+  useEffect(() => {
+    setSummary(null);
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - (windowDays - 1));
+    const iso = (d: Date) => d.toISOString().slice(0, 10);
+    dashboardApi
+      .summary(iso(from), iso(to))
+      .then(setSummary)
+      .catch(() => setSummary(null));
+  }, [windowDays]);
 
   const today = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
@@ -77,34 +42,29 @@ export default function Dashboard() {
       <Topbar
         title="Painel"
         subtitle={today}
-        actionSlot={<NewAppointmentButton />}
+        actionSlot={
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 bg-cream-100 border border-sage-100 rounded-full p-1">
+              {([7, 30] as const).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setWindowDays(d)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    windowDays === d
+                      ? "bg-sage-400 text-white"
+                      : "text-ink-500 hover:text-ink-700"
+                  }`}
+                >
+                  {d} dias
+                </button>
+              ))}
+            </div>
+            <NewAppointmentButton />
+          </div>
+        }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats.map((s, i) => {
-          const Icon = s.icon;
-          return (
-            <div
-              key={s.label}
-              className="bg-white border border-sage-100 rounded-3xl p-5 hover:shadow-soft transition-shadow animate-fadeUp"
-              style={{ animationDelay: `${i * 60}ms` }}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div
-                  className={`w-10 h-10 rounded-2xl flex items-center justify-center ${toneMap[s.tone]}`}
-                >
-                  <Icon size={18} strokeWidth={2} />
-                </div>
-              </div>
-              <div className="font-display text-2xl lg:text-3xl text-ink-700 leading-none mb-1">
-                {s.value}
-              </div>
-              <div className="text-sm text-ink-500 mt-2">{s.label}</div>
-              <div className="text-xs text-ink-400 mt-0.5">{s.sub}</div>
-            </div>
-          );
-        })}
-      </div>
+      <DashboardCharts summary={summary} />
 
       <div className="bg-white border border-sage-100 rounded-3xl p-6">
         <div className="mb-5">

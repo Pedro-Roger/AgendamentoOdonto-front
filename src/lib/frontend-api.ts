@@ -30,8 +30,24 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
   return data as T;
 }
 
+export type BookingBody = {
+  name: string;
+  cpf: string;
+  email: string;
+  phone: string;
+  serviceId: string;
+  date: string;
+  time: string;
+  reason?: string;
+  anamnesisAnswers: Array<{ key: string; value: string }>;
+};
+
 export const adminApi = {
   listServices: () => req<ServiceDto[]>('api/services'),
+  availability: (serviceId: string, date: string) =>
+    req<ScheduleDto[]>(`api/appointments/availability?serviceId=${encodeURIComponent(serviceId)}&date=${encodeURIComponent(date)}`),
+  createAppointment: (body: BookingBody) =>
+    req<AppointmentDto>('api/appointments', { method: 'POST', body: JSON.stringify(body) }),
   createService: (body: { name: string; durationMinutes: number }) => req<ServiceDto>('api/services', { method: 'POST', body: JSON.stringify(body) }),
   updateService: (id: string, body: Partial<ServiceDto>) => req<ServiceDto>(`api/services/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
 
@@ -111,8 +127,43 @@ export type UserAdminDto = {
 };
 
 export const publicApi = {
-  availableSchedules: (serviceId: string, date: string) => req<ScheduleDto[]>(`api/public/available-schedules?serviceId=${encodeURIComponent(serviceId)}&date=${encodeURIComponent(date)}`),
-  createAppointment: (body: { name: string; cpf: string; email: string; phone: string; serviceId: string; date: string; time: string; reason?: string; anamnesisAnswers: Array<{ key: string; value: string }> }) =>
-    req<AppointmentDto>('api/public/appointments', { method: 'POST', body: JSON.stringify(body) }),
+  services: (slug: string) => req<ServiceDto[]>(`api/public/${slug}/services`),
+  formSettings: (slug: string) => req<{ id: string; fields: FormFieldDto[] }>(`api/public/${slug}/form-settings`),
+  availability: (slug: string, serviceId: string, date: string) =>
+    req<ScheduleDto[]>(`api/public/${slug}/availability?serviceId=${encodeURIComponent(serviceId)}&date=${encodeURIComponent(date)}`),
+  createAppointment: (slug: string, body: BookingBody) =>
+    req<AppointmentDto>(`api/public/${slug}/appointments`, { method: 'POST', body: JSON.stringify(body) }),
+};
+
+export type DashboardSummary = {
+  totalAppointments: number;
+  newPatients: number;
+  revenue: number;
+  appointmentsByDay: { date: string; count: number }[];
+  appointmentsByService: { name: string; count: number }[];
+  appointmentsBySource: { source: string; count: number }[];
+  upcomingToday: number;
+};
+
+export const dashboardApi = {
+  summary: (from: string, to: string) =>
+    req<DashboardSummary>(`api/dashboard?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`),
+};
+
+export type ApiKeyDto = {
+  id: string;
+  name: string;
+  prefix: string;
+  allowedOrigins: string[];
+  lastUsedAt: string | null;
+  revokedAt: string | null;
+  createdAt: string;
+};
+
+export const apiKeysApi = {
+  list: () => req<ApiKeyDto[]>('api/api-keys'),
+  create: (body: { name: string; allowedOrigins: string[] }) =>
+    req<ApiKeyDto & { plaintextKey: string }>('api/api-keys', { method: 'POST', body: JSON.stringify(body) }),
+  revoke: (id: string) => req(`api/api-keys/${id}`, { method: 'DELETE' }),
 };
 

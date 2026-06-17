@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { X, Loader2, CalendarX } from "lucide-react";
-import { adminApi, publicApi } from "@/src/lib/frontend-api";
+import { adminApi } from "@/src/lib/frontend-api";
 import type { ScheduleDto, ServiceDto } from "@/src/types/dto";
 
 type Props = {
@@ -62,8 +62,8 @@ export function NewAppointmentModal({ open, onClose, onCreated }: Props) {
     }
     setLoadingSlots(true);
     setError(null);
-    publicApi
-      .availableSchedules(serviceId, date)
+    adminApi
+      .availability(serviceId, date)
       .then((list) => {
         setSlots(list);
         setTime("");
@@ -106,7 +106,7 @@ export function NewAppointmentModal({ open, onClose, onCreated }: Props) {
     setSubmitting(true);
     setError(null);
     try {
-      await publicApi.createAppointment({
+      await adminApi.createAppointment({
         name: name.trim(),
         cpf: cpf.replace(/\D/g, ""),
         email: email.trim(),

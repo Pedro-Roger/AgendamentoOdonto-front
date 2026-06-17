@@ -16,6 +16,7 @@ import {
   WifiOff,
 } from "lucide-react";
 import { adminApi } from "@/src/lib/frontend-api";
+import { ApiKeysSection } from "@/components/integracoes/ApiKeysSection";
 import Image from "next/image";
 
 const inputCls =
@@ -236,6 +237,9 @@ export default function IntegracoesPage() {
           <p>✅ O paciente confirma respondendo <strong>SIM</strong> ou clicando no link</p>
           <p className="pt-1 text-[11px] text-ink-400">Powered by <strong>Baileys</strong> — conexão direta com WhatsApp Web, sem custos adicionais.</p>
         </div>
+
+        {/* API Keys */}
+        <ApiKeysSection />
       </div>
     </AppShell>
   );

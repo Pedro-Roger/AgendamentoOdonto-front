@@ -4,7 +4,8 @@ import { AppShell } from "@/components/AppShell";
 import { Topbar } from "@/components/Topbar";
 import { NewAppointmentButton } from "@/components/NewAppointmentButton";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
-import { CalendarX } from "lucide-react";
+import { CalendarX, Sparkles, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { adminApi, dashboardApi } from "@/src/lib/frontend-api";
 import type { DashboardSummary } from "@/src/lib/frontend-api";
@@ -14,9 +15,21 @@ export default function Dashboard() {
   const [appointments, setAppointments] = useState<AppointmentListItemDto[] | null>(null);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [windowDays, setWindowDays] = useState<7 | 30>(30);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
 
   useEffect(() => {
     adminApi.listAppointments().then(setAppointments).catch(() => setAppointments([]));
+  }, []);
+
+  useEffect(() => {
+    Promise.all([adminApi.listSchedules(), adminApi.listServices()])
+      .then(([schedules, services]) => {
+        setNeedsOnboarding(
+          (schedules?.length ?? 0) === 0 && (services?.length ?? 0) === 0
+        );
+      })
+      .catch(() => setNeedsOnboarding(false));
   }, []);
 
   useEffect(() => {
@@ -63,6 +76,36 @@ export default function Dashboard() {
           </div>
         }
       />
+
+      {needsOnboarding && !onboardingDismissed && (
+        <div className="flex items-center gap-4 bg-white border border-sage-100 rounded-3xl p-5 dark:bg-ink-800 dark:border-ink-700">
+          <div className="w-11 h-11 rounded-2xl bg-sage-100 text-sage-600 flex items-center justify-center shrink-0">
+            <Sparkles size={20} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-ink-700 dark:text-cream-50">
+              Sua clínica ainda não está configurada
+            </p>
+            <p className="text-xs text-ink-400 dark:text-cream-200 mt-0.5">
+              Complete o onboarding para definir horários e o primeiro serviço.
+            </p>
+          </div>
+          <Link
+            href="/onboarding"
+            className="px-5 py-2.5 bg-sage-400 text-white rounded-full hover:bg-sage-500 transition-colors text-sm shrink-0"
+          >
+            Completar
+          </Link>
+          <button
+            type="button"
+            aria-label="Dispensar"
+            onClick={() => setOnboardingDismissed(true)}
+            className="text-ink-400 hover:text-ink-600 shrink-0"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
 
       <DashboardCharts summary={summary} />
 

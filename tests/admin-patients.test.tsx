@@ -8,6 +8,7 @@ vi.mock("@/src/lib/frontend-api", () => ({
     patientTimeline: vi.fn(),
     getMedicalRecordByPatient: vi.fn(),
     getMedicalRecord: vi.fn(),
+    listMedicalRecordsByPatient: vi.fn(() => Promise.resolve([])),
   },
 }));
 

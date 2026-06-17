@@ -166,7 +166,7 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
         })}
       </nav>
 
-      <div className="mt-auto pt-6 border-t border-sage-100">
+      <div className="mt-auto pt-6 border-t border-sage-100 dark:border-ink-700">
         <div className="flex items-center gap-3 px-2 py-2">
           <div className="w-10 h-10 rounded-full bg-peach-200 flex items-center justify-center font-display text-ink-700">
             {user ? initials(user.name) : "..."}
@@ -198,7 +198,7 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="w-64 shrink-0 bg-cream-100 border-r border-sage-100 min-h-screen hidden lg:flex flex-col p-5">
+      <aside className="w-64 shrink-0 bg-cream-100 border-r border-sage-100 min-h-screen hidden lg:flex flex-col p-5 dark:bg-ink-900 dark:border-ink-700 dark:text-cream-100">
         <SidebarContent />
       </aside>
 
@@ -209,7 +209,7 @@ export function Sidebar() {
             className="absolute inset-0 bg-ink-700/40 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="absolute left-0 top-0 bottom-0 w-64 bg-cream-100 flex flex-col p-5 shadow-2xl animate-slideIn">
+          <aside className="absolute left-0 top-0 bottom-0 w-64 bg-cream-100 flex flex-col p-5 shadow-2xl animate-slideIn dark:bg-ink-900 dark:text-cream-100">
             <button
               onClick={() => setSidebarOpen(false)}
               aria-label="Fechar menu"

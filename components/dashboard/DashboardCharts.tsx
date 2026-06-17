@@ -32,11 +32,11 @@ const brl = (v: number) =>
 
 function Kpi({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-white border border-sage-100 rounded-3xl p-5 hover:shadow-soft transition-shadow animate-fadeUp">
-      <div className="font-display text-2xl lg:text-3xl text-ink-700 leading-none mb-1">
+    <div className="bg-white border border-sage-100 rounded-3xl p-5 hover:shadow-soft transition-shadow animate-fadeUp dark:bg-ink-800 dark:border-ink-700">
+      <div className="font-display text-2xl lg:text-3xl text-ink-700 leading-none mb-1 dark:text-cream-100">
         {value}
       </div>
-      <div className="text-sm text-ink-500 mt-2">{label}</div>
+      <div className="text-sm text-ink-500 mt-2 dark:text-ink-400">{label}</div>
     </div>
   );
 }
@@ -49,8 +49,8 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white border border-sage-100 rounded-3xl p-6 animate-fadeUp">
-      <h2 className="font-display text-lg text-ink-700 mb-4">{title}</h2>
+    <div className="bg-white border border-sage-100 rounded-3xl p-6 animate-fadeUp dark:bg-ink-800 dark:border-ink-700">
+      <h2 className="font-display text-lg text-ink-700 mb-4 dark:text-cream-100">{title}</h2>
       {children}
     </div>
   );

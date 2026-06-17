@@ -4,6 +4,7 @@ import { Search, Plus, Menu } from "lucide-react";
 import type { ReactNode } from "react";
 import { useSidebar } from "./Sidebar";
 import { NotificationBell } from "./NotificationBell";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Topbar({
   title,
@@ -29,7 +30,7 @@ export function Topbar({
           <Menu size={18} />
         </button>
         <div>
-          <h1 className="font-display text-2xl lg:text-3xl text-ink-700 leading-tight">
+          <h1 className="font-display text-2xl lg:text-3xl text-ink-700 dark:text-cream-100 leading-tight">
             {title}
           </h1>
           {subtitle && (
@@ -47,9 +48,10 @@ export function Topbar({
           <input
             type="text"
             placeholder="Buscar paciente, prontuario..."
-            className="w-full sm:w-72 pl-10 pr-4 py-2.5 bg-cream-100 border border-sage-100 rounded-full text-sm placeholder:text-ink-400 focus:outline-none focus:border-sage-300 focus:bg-white transition-all"
+            className="w-full sm:w-72 pl-10 pr-4 py-2.5 bg-cream-100 border border-sage-100 rounded-full text-sm placeholder:text-ink-400 focus:outline-none focus:border-sage-300 focus:bg-white transition-all dark:bg-ink-700/40 dark:border-ink-700 dark:text-cream-100 dark:focus:bg-ink-700/60"
           />
         </div>
+        <ThemeToggle />
         <NotificationBell />
         {actionSlot}
         {!actionSlot && action && (

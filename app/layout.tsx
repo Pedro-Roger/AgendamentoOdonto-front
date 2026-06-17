@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/src/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
+import { themeInitScript } from "@/src/lib/theme";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -75,13 +76,16 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: light)", color: "#fffdf7" },
     { media: "(prefers-color-scheme: dark)", color: "#1a1a1a" },
   ],
-  colorScheme: "light",
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body className="bg-cream-50 text-ink-700">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="bg-cream-50 text-ink-700 dark:bg-ink-800 dark:text-cream-100">
         <JsonLd />
         {children}
       </body>

@@ -6,6 +6,7 @@ vi.mock("@/src/lib/frontend-api", () => ({
     listPatients: vi.fn(),
     patientProfile: vi.fn(),
     patientTimeline: vi.fn(),
+    deletePatient: vi.fn(),
     getMedicalRecordByPatient: vi.fn(),
     getMedicalRecord: vi.fn(),
     listMedicalRecordsByPatient: vi.fn(() => Promise.resolve([])),
@@ -58,6 +59,22 @@ describe("SDD Phase 3 / Slice 5 — Patients list", () => {
     vi.mocked(adminApi.listPatients).mockResolvedValue([]);
     render(<PacientesPage />);
     expect(await screen.findByText(/nenhum paciente/i)).toBeInTheDocument();
+  });
+
+  it("removes a patient after confirmation", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    vi.mocked(adminApi.listPatients).mockResolvedValue([
+      { id: "p1", name: "Marina Castro", cpf: "12345678900", email: "m@x.com", phone: "11999999999" },
+    ]);
+    vi.mocked(adminApi.deletePatient).mockResolvedValue({ deleted: true, id: "p1" } as any);
+
+    render(<PacientesPage />);
+    expect(await screen.findByText("Marina Castro")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /remover marina castro/i }));
+
+    await waitFor(() => expect(adminApi.deletePatient).toHaveBeenCalledWith("p1"));
+    expect(screen.queryByText("Marina Castro")).not.toBeInTheDocument();
   });
 });
 

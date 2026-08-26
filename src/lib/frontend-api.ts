@@ -81,6 +81,7 @@ export const adminApi = {
   generateSignatureLink: (medicalRecordId: string) => req('api/signatures/electronic/generate-link', { method: 'POST', body: JSON.stringify({ medicalRecordId }) }),
 
   listPatients: (q?: string) => req<PatientDto[]>(`api/patients${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+  deletePatient: (id: string) => req<{ deleted: boolean; id: string }>(`api/patients/${id}`, { method: 'DELETE' }),
   listAppointments: (date?: string) => req<AppointmentListItemDto[]>(`api/appointments${date ? `?date=${encodeURIComponent(date)}` : ''}`),
   listAppointmentsWeek: (from: string, to: string) => req<AppointmentListItemDto[]>(`api/appointments/week?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`),
   patientProfile: (id: string) => req(`api/patients/${id}/profile`),
@@ -130,7 +131,7 @@ export const publicApi = {
   services: (slug: string) => req<ServiceDto[]>(`api/public/${slug}/services`),
   formSettings: (slug: string) => req<{ id: string; fields: FormFieldDto[] }>(`api/public/${slug}/form-settings`),
   availability: (slug: string, serviceId: string, date: string) =>
-    req<ScheduleDto[]>(`api/public/${slug}/availability?serviceId=${encodeURIComponent(serviceId)}&date=${encodeURIComponent(date)}`),
+    req<ScheduleDto[]>(`api/public/${slug}/available-schedules?serviceId=${encodeURIComponent(serviceId)}&date=${encodeURIComponent(date)}`),
   createAppointment: (slug: string, body: BookingBody) =>
     req<AppointmentDto>(`api/public/${slug}/appointments`, { method: 'POST', body: JSON.stringify(body) }),
 };
@@ -166,4 +167,3 @@ export const apiKeysApi = {
     req<ApiKeyDto & { plaintextKey: string }>('api/api-keys', { method: 'POST', body: JSON.stringify(body) }),
   revoke: (id: string) => req(`api/api-keys/${id}`, { method: 'DELETE' }),
 };
-

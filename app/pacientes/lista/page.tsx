@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Topbar } from "@/components/Topbar";
-import { Search, ChevronRight, Users, AlertCircle } from "lucide-react";
+import { Search, ChevronRight, Users, AlertCircle, Trash2, Loader2 } from "lucide-react";
 import { adminApi } from "@/src/lib/frontend-api";
 import type { PatientDto } from "@/src/types/dto";
 
@@ -29,6 +29,7 @@ export default function PacientesPage() {
   const [patients, setPatients] = useState<PatientDto[] | null>(null);
   const [q, setQ] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -41,6 +42,22 @@ export default function PacientesPage() {
   }, [q]);
 
   const total = patients?.length ?? 0;
+
+  async function handleDelete(patient: PatientDto) {
+    const confirmed = window.confirm(`Remover ${patient.name}? O histórico ligado a este paciente também será removido.`);
+    if (!confirmed) return;
+
+    setDeletingId(patient.id);
+    setError(null);
+    try {
+      await adminApi.deletePatient(patient.id);
+      setPatients((current) => current?.filter((item) => item.id !== patient.id) ?? current);
+    } catch (e: any) {
+      setError(e?.message ?? "Erro ao remover paciente");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   return (
     <AppShell>
@@ -79,21 +96,32 @@ export default function PacientesPage() {
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {(patients ?? []).map((p) => (
             <li key={p.id}>
-              <Link
-                href={`/pacientes/perfil?id=${encodeURIComponent(p.id)}`}
-                className="flex items-center gap-4 p-4 bg-white border border-sage-100 rounded-2xl hover:shadow-soft transition-all group"
-              >
-                <div className="w-11 h-11 rounded-full bg-peach-100 text-peach-500 flex items-center justify-center font-display">
-                  {initials(p.name)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-ink-700 truncate">{p.name}</div>
-                  <div className="text-xs text-ink-400 truncate">
-                    {maskCpf(p.cpf)} · {p.phone}
+              <div className="flex items-center gap-2 p-3 bg-white border border-sage-100 rounded-2xl hover:shadow-soft transition-all group">
+                <Link
+                  href={`/pacientes/perfil?id=${encodeURIComponent(p.id)}`}
+                  className="flex min-w-0 flex-1 items-center gap-4"
+                >
+                  <div className="w-11 h-11 rounded-full bg-peach-100 text-peach-500 flex items-center justify-center font-display">
+                    {initials(p.name)}
                   </div>
-                </div>
-                <ChevronRight size={16} className="text-ink-400 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-ink-700 truncate">{p.name}</div>
+                    <div className="text-xs text-ink-400 truncate">
+                      {maskCpf(p.cpf)} · {p.phone}
+                    </div>
+                  </div>
+                  <ChevronRight size={16} className="text-ink-400 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+                <button
+                  type="button"
+                  aria-label={`Remover ${p.name}`}
+                  onClick={() => handleDelete(p)}
+                  disabled={deletingId === p.id}
+                  className="h-10 w-10 shrink-0 rounded-full border border-rose-100 text-rose-400 hover:bg-rose-100 disabled:opacity-60 flex items-center justify-center transition-colors"
+                >
+                  {deletingId === p.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                </button>
+              </div>
             </li>
           ))}
         </ul>

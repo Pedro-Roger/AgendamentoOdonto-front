@@ -6,7 +6,7 @@ import { publicApi } from "@/src/lib/frontend-api";
 import type { ScheduleDto, ServiceDto } from "@/src/types/dto";
 
 const inputCls =
-  "w-full px-3.5 py-2.5 bg-cream-50 border border-sage-100 rounded-2xl text-sm placeholder:text-ink-400 focus:outline-none focus:border-sage-300 focus:bg-white transition-all";
+  "w-full px-3.5 py-2.5 bg-white border border-sage-200 rounded-2xl text-sm text-ink-700 placeholder:text-ink-400 focus:outline-none focus:border-sage-400 focus:ring-2 focus:ring-sage-100 transition-all";
 
 const todayIso = () => new Date().toISOString().slice(0, 10);
 

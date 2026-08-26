@@ -30,6 +30,7 @@ describe("BookingForm — agendamento público por slug", () => {
     render(<BookingForm slug="dra-herlania" />);
 
     await waitFor(() => expect(screen.getByRole("option", { name: /Limpeza/ })).toBeTruthy());
+    expect(screen.getByPlaceholderText("Maria Silva")).toHaveClass("text-ink-700");
 
     fireEvent.change(screen.getByPlaceholderText("Maria Silva"), {
       target: { value: "Maria Silva" },

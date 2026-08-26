@@ -3,6 +3,7 @@
 import { AppShell } from "@/components/AppShell";
 import { Topbar } from "@/components/Topbar";
 import { NewAppointmentButton } from "@/components/NewAppointmentButton";
+import { BookingLinkButton } from "@/components/BookingLinkButton";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 import { CalendarX, Sparkles, X } from "lucide-react";
 import Link from "next/link";
@@ -57,6 +58,7 @@ export default function Dashboard() {
         subtitle={today}
         actionSlot={
           <div className="flex items-center gap-3">
+            <BookingLinkButton />
             <div className="flex items-center gap-1 bg-cream-100 border border-sage-100 rounded-full p-1">
               {([7, 30] as const).map((d) => (
                 <button

@@ -56,9 +56,8 @@ function safeJson(raw: string) {
 }
 
 export async function loginRequest(email: string, password: string) {
-  return apiFetch<{ accessToken: string; user: { id: string; name: string; email: string; role: UserSession['role'] } }>('/api/auth/login', {
+  return apiFetch<{ accessToken: string; user: { id: string; name: string; email: string; role: UserSession['role']; tenantSlug?: string | null } }>('/api/auth/login', {
     method: 'POST',
     body: { email, password },
   });
 }
-

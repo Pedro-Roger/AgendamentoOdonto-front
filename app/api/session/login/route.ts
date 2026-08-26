@@ -13,6 +13,7 @@ export async function POST(request: Request) {
       name: login.user.name,
       email: login.user.email,
       role: login.user.role,
+      tenantSlug: login.user.tenantSlug,
       accessToken: login.accessToken,
     });
 
@@ -31,4 +32,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ message }, { status: 401 });
   }
 }
-

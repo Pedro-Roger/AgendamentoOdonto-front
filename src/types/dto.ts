@@ -5,6 +5,7 @@ export type UserSession = {
   name: string;
   email: string;
   role: UserRole;
+  tenantSlug?: string | null;
   accessToken: string;
 };
 
@@ -61,4 +62,3 @@ export type AppointmentListItemDto = {
   patient: { id: string; name: string; cpf: string; email: string; phone: string };
   service: { id: string; name: string; durationMinutes: number };
 };
-

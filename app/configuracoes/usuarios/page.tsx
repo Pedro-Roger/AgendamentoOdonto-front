@@ -391,6 +391,13 @@ function UserModal({
             {isSelf && (
               <p className="text-[11px] text-ink-400 mt-1">Não é possível alterar o próprio perfil.</p>
             )}
+            {role === "DENTISTA" && !isEdit && (
+              <p className="text-[11px] text-ink-400 mt-1">
+                Cada dentista tem consultório próprio: a conta é criada em uma Compania separada, com
+                agenda e pacientes só dela, e entra como Master para poder cadastrar a própria equipe —
+                por isso não aparece nesta lista depois de salva.
+              </p>
+            )}
           </div>
           {isEdit && (
             <div className="flex items-center gap-3">
